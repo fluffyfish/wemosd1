@@ -17,19 +17,24 @@
 #define DHTTYPE DHT22
 DHT dht(DHTPIN, DHTTYPE);
 #include <ESP8266WiFi.h>
-String apiKey = "xxxxxxxxxxxxxxx";  
+extern "C" {
+    #include "user_interface.h"
+}
+String apiKey = "xxxxxxxx";  
 const char* ssid = "TheBananaStand";
-const char* password = "xxxxxxxxxxxxxxx";
+const char* password = "xxxxxxx";
 const char* server = "api.thingspeak.com";
 
 // sleep for this many seconds
-const int sleepSeconds = 15*60;
+const int sleepSeconds = 30*60;
 
 float humidity, temperature, heatIndex;
 char str_humidity[10], str_temperature[10], str_heatIndex[10];
 WiFiClient client;
 
 void setup() {
+  // turn off wifi led
+  wifi_status_led_uninstall();
   Serial.begin(115200);
   Serial.println("\n\nWake up");
 
@@ -42,10 +47,12 @@ void setup() {
   Serial.println(ssid);
  
   WiFi.begin(ssid, password);
- 
+  int cnt = 0;
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
+    cnt = cnt+1;
+    if (cnt == 10) break;
   }
   Serial.println();
   delay(10);
